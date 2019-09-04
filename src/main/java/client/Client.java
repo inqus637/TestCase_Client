@@ -59,7 +59,6 @@ public class Client {
                 str = scan.nextLine();
                 if (str.equals("send")){
                     xmlSend();
-                    System.out.println("Ошибка в send");
                     sleep(1000);
                     System.out.println("Для отправки сообщения введите в консоль слово send");
                     System.out.println("Для выхода введите в консоль слово exit");
