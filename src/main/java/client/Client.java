@@ -52,10 +52,7 @@ public class Client {
             String str = "";
             System.out.println("Для отправки сообщения введите в консоль слово send");
             System.out.println("Для выхода введите в консоль слово exit");
-            while (true) {
-                if (str.equals("exit")) {
-                    break;
-                }
+            while (!str.equals("exit")) {
                 str = scan.nextLine();
                 if (str.equals("send")){
                     xmlSend();
@@ -66,6 +63,7 @@ public class Client {
 
             }
             resend.setStop();
+			System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
