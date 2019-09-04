@@ -17,11 +17,6 @@ import org.xembly.Directives;
 import org.xembly.ImpossibleModificationException;
 import org.xembly.Xembler;
 
-/**
- * Обеспечивает работу программы в режиме клиента
- *
- * @author Влад
- */
 public class Client {
 
     private BufferedReader in;
@@ -47,23 +42,29 @@ public class Client {
             socket = new Socket(ip, portInt);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-           
             // Запускаем вывод всех входящих сообщений в консоль
             Resender resend = new Resender();
             resend.start();
-            out.print("connect");
             sleep(1000);
-            out.println("start");
-            
-            out.println(xmlClientMessage());
-            out.println("end");
-            System.out.println("тест строка2");
+            out.println("connect");
             // Пока пользователь не введёт "exit" отправляем на сервер всё, что
             // введено из консоли
             String str = "";
-            while (!str.equals("exit")) {
+            System.out.println("Для отправки сообщения введите в консоль слово send");
+            System.out.println("Для выхода введите в консоль слово exit");
+            while (true) {
+                if (str.equals("exit")) {
+                    break;
+                }
                 str = scan.nextLine();
-                out.println(str);
+                if (str.equals("send")){
+                    xmlSend();
+                    System.out.println("Ошибка в send");
+                    sleep(1000);
+                    System.out.println("Для отправки сообщения введите в консоль слово send");
+                    System.out.println("Для выхода введите в консоль слово exit");
+                }
+
             }
             resend.setStop();
         } catch (Exception e) {
@@ -72,10 +73,13 @@ public class Client {
             close();
         }
     }
-     public static String xmlClientMessage() throws ImpossibleModificationException {
-        Locale loc = new Locale("es", "ES");
-        Scanner scan = new Scanner(System.in, "UTF-8");
-        scan.useLocale(loc);
+    private   void xmlSend() throws ImpossibleModificationException {
+        out.println("start");
+        out.println(xmlClientMessage());
+        out.println("end");
+    }
+    private static String xmlClientMessage() throws ImpossibleModificationException {
+        Scanner scan = new Scanner(System.in);
         System.out.println("Введите свое имя:");
         String name = scan.nextLine();
         System.out.println("Введите свою Фамилию:");
@@ -104,25 +108,6 @@ public class Client {
         ).xml();
         System.out.println("для отправки данных на сервер нажмите Enter");
         scan.nextLine();
-        //System.out.println(xml);
-        return xml;
-    }
-
-    public static String xmlSrverMessage(String name, String message) throws ImpossibleModificationException {
-        SimpleDateFormat dt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Date date = new Date();
-        String dateString = dt.format(date);
-        String xml = new Xembler(
-                new Directives()
-                        .add("response")
-                        .add("message")
-                        .set("Добрый день, " + name + ", Ваше сообщение успешно обработано!")
-                        .up()
-                        .add("date")
-                        .set(dateString)
-                        .up()
-        ).xml();
-        System.out.println(xml);
         return xml;
     }
 
@@ -143,7 +128,7 @@ public class Client {
      * Класс в отдельной нити пересылает все сообщения от сервера в консоль.
      * Работает пока не будет вызван метод setStop().
      *
-     * @author Влад
+     *
      */
     private class Resender extends Thread {
 
@@ -152,7 +137,7 @@ public class Client {
         /**
          * Прекращает пересылку сообщений
          */
-        public void setStop() {
+        private  void setStop() {
             stoped = true;
         }
 
